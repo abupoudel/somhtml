@@ -1,0 +1,536 @@
+<html>
+	<head>
+		<title>SOM: Self Organizing Map Test</title>
+		<script src="jquery.min.js"></script>
+		<style>
+			#samples{
+				width: 100%;
+			}
+			#samples .individual{
+				width: 200px;
+				height: 200px;
+				display: inline-block;
+				margin: 20px;
+			}
+			#samples span{
+				width: 11%;
+				height: 8.2%;
+				display: inline-block;
+				border: 1px solid;
+			}
+			#samples span.open{
+				background: black;
+			}
+			#inputSample{
+				width: 200px;
+				height: 200px;
+				margin: 0 auto;
+			}
+			#inputSample span{
+				width: 11%;
+				height: 8.2%;
+				display: inline-block;
+				border: 1px solid;
+			}
+			#inputSample span.open{
+				background: black;
+			}
+			#saveButton{
+				width: 500px;
+				margin: 0 auto;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="inputSample">
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+			<span></span>
+		</div>
+		<div id="saveButton">
+			<button type="button" id="buttonAdd">Add</button>
+			<button type="button" id="clearAdder">Clear</button>
+			<button type="button" id="testThis">Test</button>
+			<br />
+			<button type="button" id="initializeWeight">Initialize Weight</button>
+			<button type="button" class="startTraining">Start Training</button>
+			<button type="button" class="startTraining reTraining">Re-Training</button>
+		</div>
+		<div id="samples">
+		</div>
+		<script type="text/javascript">
+			
+			var A1 = [0, 0, 1, 1, 0, 0, 0, 
+				  0, 0, 0, 1, 0, 0, 0, 
+				  0, 0, 0, 1, 0, 0, 0, 
+				  0, 0, 1, 0, 1, 0, 0, 
+				  0, 0, 1, 0, 1, 0, 0, 
+				  0, 1, 1, 1, 1, 1, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  1, 1, 1, 0, 1, 1, 1]
+
+			var B1 = [1, 1, 1, 1, 1, 1, 0, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 1, 1, 1, 1, 0, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  1, 1, 1, 1, 1, 1, 0]
+
+			var C1 = [0, 0, 1, 1, 1, 1, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 0, 1, 1, 1, 1, 0]
+
+			var D1 = [1, 1, 1, 1, 1, 0, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  1, 1, 1, 1, 1, 0, 0]
+
+			var E1 = [1, 1, 1, 1, 1, 1, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 0, 0, 
+				  0, 1, 0, 1, 0, 0, 0, 
+				  0, 1, 1, 1, 0, 0, 0, 
+				  0, 1, 0, 1, 0, 0, 0, 
+				  0, 1, 0, 0, 0, 0, 0, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  1, 1, 1, 1, 1, 1, 1]
+
+			var J1 = [0, 0, 0, 1, 1, 1, 1, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 0, 1, 1, 1, 0, 0]
+
+			var K1 = [1, 1, 1, 0, 0, 1, 1, 
+				  0, 1, 0, 0, 1, 0, 0, 
+				  0, 1, 0, 1, 0, 0, 0, 
+				  0, 1, 1, 0, 0, 0, 0, 
+				  0, 1, 1, 0, 0, 0, 0, 
+				  0, 1, 0, 1, 0, 0, 0, 
+				  0, 1, 0, 0, 1, 0, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  1, 1, 1, 0, 0, 1, 1]
+
+			var A2 = [0, 0, 0, 1, 0, 0, 0, 
+				  0, 0, 0, 1, 0, 0, 0, 
+				  0, 0, 0, 1, 0, 0, 0, 
+				  0, 0, 1, 0, 1, 0, 0, 
+				  0, 0, 1, 0, 1, 0, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 1, 1, 1, 1, 1, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 0, 1, 0]
+
+			var B2 = [1, 1, 1, 1, 1, 1, 0, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 1, 1, 1, 1, 1, 0, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 1, 1, 1, 1, 1, 0]
+
+			var C2 = [0, 0, 1, 1, 1, 0, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 0, 1, 1, 1, 0, 0]
+
+			var D2 = [1, 1, 1, 1, 1, 0, 0, 
+				  1, 0, 0, 0, 0, 1, 0, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 0, 0, 0, 0, 1, 0, 
+				  1, 1, 1, 1, 1, 0, 0]
+
+			var E2 = [1, 1, 1, 1, 1, 1, 1, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 1, 1, 1, 1, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 1, 1, 1, 1, 1, 1]
+
+			var J2 = [0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 0, 1, 1, 1, 0, 0]
+
+			var K2 = [1, 0, 0, 0, 0, 1, 0, 
+				  1, 0, 0, 0, 1, 0, 0, 
+				  1, 0, 0, 1, 0, 0, 0, 
+				  1, 0, 1, 0, 0, 0, 0, 
+				  1, 1, 0, 0, 0, 0, 0, 
+				  1, 0, 1, 0, 0, 0, 0, 
+				  1, 0, 0, 1, 0, 0, 0, 
+				  1, 0, 0, 0, 1, 0, 0, 
+				  1, 0, 0, 0, 0, 1, 0]
+
+			var A3 = [0, 0, 0, 1, 0, 0, 0, 
+				  0, 0, 0, 1, 0, 0, 0, 
+				  0, 0, 1, 0, 1, 0, 0, 
+				  0, 0, 1, 0, 1, 0, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 1, 1, 1, 1, 1, 0, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 1, 0, 0, 0, 1, 1]
+
+			var B3 = [1, 1, 1, 1, 1, 1, 0, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 1, 1, 1, 1, 0, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  1, 1, 1, 1, 1, 1, 0]
+
+			var C3 = [0, 0, 1, 1, 1, 0, 1, 
+				  0, 1, 0, 0, 0, 1, 1, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 0, 
+				  1, 0, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 0, 1, 1, 1, 0, 0]
+
+			var D3 = [1, 1, 1, 1, 0, 0, 0, 
+				  0, 1, 0, 0, 1, 0, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 1, 0, 0, 
+				  1, 1, 1, 1, 0, 0, 0]
+
+			var E3 = [1, 1, 1, 1, 1, 1, 1, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  0, 1, 0, 0, 1, 0, 0, 
+				  0, 1, 1, 1, 1, 0, 0, 
+				  0, 1, 0, 0, 1, 0, 0, 
+				  0, 1, 0, 0, 0, 0, 0, 
+				  0, 1, 0, 0, 0, 0, 0, 
+				  0, 1, 0, 0, 0, 0, 1, 
+				  1, 1, 1, 1, 1, 1, 1]
+
+			var J3 = [0, 0, 0, 0, 1, 1, 1, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 0, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 0, 1, 1, 1, 0, 0]
+
+			var K3 = [1, 1, 1, 0, 0, 1, 1, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  0, 1, 0, 0, 1, 0, 0, 
+				  0, 1, 0, 1, 0, 0, 0, 
+				  0, 1, 1, 0, 0, 0, 0, 
+				  0, 1, 0, 1, 0, 0, 0, 
+				  0, 1, 0, 0, 1, 0, 0, 
+				  0, 1, 0, 0, 0, 1, 0, 
+				  1, 1, 1, 0, 0, 1, 1]
+			
+			var trainingSets = [];
+			
+			var min_alpha = 0.01;
+			var alpha = 0.6;
+			var decayRate = 0.96;
+			var clusters = 26;
+			
+			var weights = [];
+			var trainingGroups = [];
+			var boxLength = 0;
+			$(document).ready(function(){
+				boxLength = $("#inputSample span").length;
+				$("#initializeWeight").click(initilizeInitialWeights);
+				
+				$("#testThis").click(function(){
+					var listed = [];
+					$("#inputSample span").each(function(){
+						listed.push($(this).hasClass("open")===true?1:0);
+					});
+					// now we test this thing with what we have here
+					var ds = [];
+					var ds_min = 0;
+					var ds_index = 0;
+					var ds_weight_index = 0;
+					var thisSet = trainingSets[i];
+					for(k=0;k<weights.length;k++){
+						var dss = 0;
+						for(j=0;j<listed.length;j++){
+							dss += (listed[j] - weights[k][j]) ** 2;
+						}
+						//dss = Math.round(dss * 1000) / 1000;
+						if(ds_min == 0 || dss < ds_min){
+							ds_weight_index = k;
+							ds_min = dss;
+						}
+						ds.push(dss);
+					}
+					console.log("Potential group for given input is at: " + ds_weight_index);
+					alert("Potential group for given input is at: " + ds_weight_index);
+				});
+				
+				$(".startTraining").click(function(){
+					alpha = 0.6;
+					if(!$(this).hasClass("reTraining")){
+						initilizeInitialWeights();
+						trainingGroups = [];
+						for(i=0;i<trainingSets.length;i++){
+							trainingGroups.push(0);
+						}
+					}
+					console.time("Traning Completed");
+					console.time("Traning Started");
+					var counter = 0;
+					while(min_alpha<alpha){
+						for(i=0;i<trainingSets.length;i++){
+							var ds = [];
+							var ds_min = 0;
+							var ds_index = 0;
+							var ds_weight_index = 0;
+							var thisSet = trainingSets[i];
+							for(k=0;k<weights.length;k++){
+								var dss = 0;
+								for(j=0;j<thisSet.length;j++){
+									dss += (thisSet[j] - weights[k][j]) ** 2;
+								}
+								//dss = Math.round(dss * 1000) / 1000;
+								if(ds_min == 0 || dss < ds_min){
+									ds_index = i;
+									ds_weight_index = k;
+									ds_min = dss;
+									trainingGroups[i] = ds_weight_index;
+								}
+								ds.push(dss);
+							}
+							// Now update the weight
+							for(p=0;p<weights[ds_weight_index].length;p++){
+								weights[ds_weight_index][p] = weights[ds_weight_index][p] + alpha*(trainingSets[ds_index][p] - weights[ds_weight_index][p]);
+							}
+						}
+						// update decay rate
+						alpha *= decayRate;
+						counter++;
+					}
+					console.timeEnd("Traning Completed");
+					console.log("Total number of iterations: " + counter);
+					$("#samples .individual").each(function(index){
+						$(this).attr("title", trainingGroups[index]);
+					});
+				});
+				$("#inputSample span").click(function(){
+					$(this).toggleClass("open");
+				});
+				$("#buttonAdd").click(function(){
+					var listed = [];
+					$("#inputSample span").each(function(){
+						listed.push($(this).hasClass("open")===true?1:0);
+					});
+					addTraningPreview(listed);
+					trainingSets.push(listed);
+				});
+				
+				$("#clearAdder").click(function(){
+					$("#inputSample span").removeClass("open");
+				});
+				
+				$("body").on("dblclick",".individual",function(){
+					$(this).addClass("abouttoremove");
+					if(confirm("Delete this?")){
+						var index = -1;
+						$("#samples .individual").each(function(i){
+							if(index>-1) return;
+							if($(this).hasClass("abouttoremove")) index = i;
+						});
+						if(index>-1) trainingSets.splice(index,1);
+						$(this).remove();
+					}
+					$(this).removeClass("abouttoremove");
+				});
+				
+				function addTraningPreview(sets){
+					var sample = $("<div>").addClass("individual").html($("#inputSample").html());
+					sample.find("span").removeClass("open");
+					sample.find("span").each(function(index){
+						if(sets[index] == 1){
+							$(this).addClass("open");
+						}
+					});
+					$("#samples").append(sample);
+				}
+				
+				function initilizeInitialWeights(){
+					console.time("Weight Initialized");
+					weights = [];
+					for(i=0;i<clusters;i++){
+						var wv = [];
+						for(j=0;j<boxLength;j++){
+							//wv.push(Math.round(Math.random()*1000)/1000);
+							wv.push(Math.random());
+						}
+						weights.push(wv);
+					}
+					console.timeEnd("Weight Initialized");
+				}
+				
+				// we just add the default samples we already have generated
+				addTraningPreview(A1);
+				trainingSets.push(A1);
+				addTraningPreview(B1);
+				trainingSets.push(B1);
+				addTraningPreview(C1);
+				trainingSets.push(C1);
+				addTraningPreview(D1);
+				trainingSets.push(D1);
+				addTraningPreview(E1);
+				trainingSets.push(E1);
+				addTraningPreview(J1);
+				trainingSets.push(J1);
+				addTraningPreview(K1);
+				trainingSets.push(K1);
+				
+				addTraningPreview(A2);
+				trainingSets.push(A2);
+				addTraningPreview(B2);
+				trainingSets.push(B2);
+				addTraningPreview(C2);
+				trainingSets.push(C2);
+				addTraningPreview(D2);
+				trainingSets.push(D2);
+				addTraningPreview(E2);
+				trainingSets.push(E2);
+				addTraningPreview(J2);
+				trainingSets.push(J3);
+				addTraningPreview(K3);
+				trainingSets.push(K2);
+				
+				addTraningPreview(A3);
+				trainingSets.push(A3);
+				addTraningPreview(B3);
+				trainingSets.push(B3);
+				addTraningPreview(C3);
+				trainingSets.push(C3);
+				addTraningPreview(D3);
+				trainingSets.push(D3);
+				addTraningPreview(E3);
+				trainingSets.push(E3);
+				addTraningPreview(J3);
+				trainingSets.push(J3);
+				addTraningPreview(K3);
+				trainingSets.push(K3);
+				
+			});
+			
+		</script>
+	</body>
+</html>
